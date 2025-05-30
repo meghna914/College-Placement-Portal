@@ -86,8 +86,8 @@ For more advanced database management, you can use tools like:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/college-placement-portal.git
-cd college-placement-portal
+git clone https://github.com/YOUR_USERNAME/College-Placement-Portal.git
+cd College-Placement-Portal
 ```
 
 2. Create a virtual environment and activate it:
