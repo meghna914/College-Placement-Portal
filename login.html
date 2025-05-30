@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Placement Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-university"></i> PlacementHub
+    </div>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="showLogin()">Login</div>
+      <div class="tab" onclick="showRegister()">Register</div>
+    </div>
+    
+    <div id="login-form">
+      <h2 id="loginTitle">Login</h2>
+      <form action="#" method="POST">
+        <div class="form-group">
+          <input type="text" id="username" placeholder="Username or Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </div>
+        <div class="form-footer">
+          <p>Forgot your password? <a href="#">Reset it here</a></p>
+        </div>
+      </form>
+    </div>
+    
+  <div id="register-form" style="display: none;">
+      <p>Please go to the <a href="/register" id="register-link">registration page</a> to create a new account.</p>
+    </div>
+    
+    <div class="form-footer">
+      <a href="/" class="btn home-btn"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role') || 'user';
+    document.getElementById("loginTitle").innerText = `${role.charAt(0).toUpperCase() + role.slice(1)} Login`;
+    
+    // Update register link with role parameter
+    document.getElementById("register-link").href = `register.html?role=${role}`;
+    
+    function showLogin() {
+      document.querySelector('.tab:nth-child(1)').classList.add('active');
+      document.querySelector('.tab:nth-child(2)').classList.remove('active');
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('register-form').style.display = 'none';
+    }
+    
+    function showRegister() {
+      document.querySelector('.tab:nth-child(1)').classList.remove('active');
+      document.querySelector('.tab:nth-child(2)').classList.add('active');
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

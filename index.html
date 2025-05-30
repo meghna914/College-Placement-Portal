@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Placement Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-particles"></div>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-university"></i> <span class="highlight">Placement</span>Hub
+    </div>
+    
+    <div class="hero-section">
+      <div class="hero-badge">Premier Placement Platform</div>
+      <h1>Welcome to College Placement Portal</h1>
+      <p>Connect with top companies, showcase your skills, and find your dream job through our streamlined placement platform.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-number">500+</span>
+          <span class="stat-label">Students Placed</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-number">100+</span>
+          <span class="stat-label">Partner Companies</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-number">95%</span>
+          <span class="stat-label">Placement Rate</span>
+        </div>
+      </div>
+    </div>    <div class="cards-container">
+      <div class="card">
+        <div class="card-icon student-icon">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <h2>For Students</h2>
+        <div class="card-features">
+          <div class="feature"><i class="fas fa-check"></i> Build a professional profile</div>
+          <div class="feature"><i class="fas fa-check"></i> Apply to job openings</div>
+          <div class="feature"><i class="fas fa-check"></i> Track application status</div>
+        </div>        <div class="login-options">
+          <a href="/login?role=student" class="btn"><i class="fas fa-sign-in-alt"></i> Student Login</a>
+          <a href="/register?role=student" class="btn btn-outline"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+      </div>
+
+      <div class="card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="card-icon company-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <h2>For Companies</h2>
+        <div class="card-features">
+          <div class="feature"><i class="fas fa-check"></i> Post job opportunities</div>
+          <div class="feature"><i class="fas fa-check"></i> Review applicant profiles</div>
+          <div class="feature"><i class="fas fa-check"></i> Streamlined recruitment</div>
+        </div>
+        <div class="login-options">          <a href="/login?role=company" class="btn"><i class="fas fa-sign-in-alt"></i> Company Login</a>
+          <a href="/register?role=company" class="btn btn-outline"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon admin-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h2>For Administrators</h2>
+        <div class="card-features">
+          <div class="feature"><i class="fas fa-check"></i> Manage placement process</div>
+          <div class="feature"><i class="fas fa-check"></i> Approve registrations</div>
+          <div class="feature"><i class="fas fa-check"></i> Generate detailed reports</div>
+        </div>
+        <div class="login-options">
+          <a href="/login?role=admin" class="btn"><i class="fas fa-sign-in-alt"></i> Admin Login</a>
+        </div>
+      </div>    </div>
+
+    <div class="testimonial-section">
+      <h2>What Our Users Say</h2>
+      <div class="testimonials">
+        <div class="testimonial">
+          <div class="testimonial-content">
+            <p>"The placement portal streamlined my job application process and helped me secure a position at my dream company."</p>
+          </div>
+          <div class="testimonial-author">
+            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Student Testimonial">
+            <div>
+              <h4>Priya Sharma</h4>
+              <p>B.Tech CSE, 2024</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial">
+          <div class="testimonial-content">
+            <p>"As a recruiter, this platform made it incredibly easy to find qualified candidates that match our requirements."</p>
+          </div>
+          <div class="testimonial-author">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Company Testimonial">
+            <div>
+              <h4>Rahul Mehra</h4>
+              <p>HR Manager, TechSolutions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="cta-section">
+      <h2>Ready to Begin Your Journey?</h2>
+      <p>Join thousands of students and companies on our platform today</p>
+      <div class="cta-buttons">
+        <a href="register.html?role=student" class="btn btn-large"><i class="fas fa-rocket"></i> Get Started Now</a>
+      </div>
+    </div>
+    
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <i class="fas fa-university"></i> <span>PlacementHub</span>
+        </div>
+        <div class="footer-links">
+          <a href="#">About Us</a>
+          <a href="#">Contact</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 PlacementHub. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Animation for cards
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate cards
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 200 * index);
+      });
+      
+      // Animate stats
+      const stats = document.querySelectorAll('.hero-stat');
+      stats.forEach((stat, index) => {
+        stat.style.opacity = '0';
+        setTimeout(() => {
+          stat.style.transition = 'opacity 0.5s ease';
+          stat.style.opacity = '1';
+        }, 1000 + 200 * index);
+      });
+      
+      // Animate testimonials
+      const testimonials = document.querySelectorAll('.testimonial');
+      testimonials.forEach((testimonial, index) => {
+        testimonial.style.opacity = '0';
+        testimonial.style.transform = 'translateX(20px)';
+        setTimeout(() => {
+          testimonial.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          testimonial.style.opacity = '1';
+          testimonial.style.transform = 'translateX(0)';
+        }, 1500 + 300 * index);
+      });
+    });
+  </script>
+</body>
+</html>
+

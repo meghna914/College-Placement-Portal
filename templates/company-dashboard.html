@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Dashboard{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-building"></i> Company Dashboard</h2>
+
+<div class="user-greeting">
+  <h3>Welcome, {{ company.company_name }}</h3>
+  <p>Industry: {{ company.industry }}</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('profile')">Company Profile</div>
+  <div class="tab" onclick="showTab('jobs')">Job Postings</div>
+  <div class="tab" onclick="showTab('applications')">Applications</div>
+  <div class="tab" onclick="showTab('notifications')">Notifications</div>
+</div>
+
+<section id="profile-tab" class="card">
+  <h3><i class="fas fa-id-card"></i> Company Profile</h3>
+  <form id="company-profile-form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="form-column">
+        <div class="form-group">
+          <label for="company_name">Company Name</label>
+          <input type="text" id="company_name" name="company_name" value="{{ company.company_name }}" required>
+        </div>
+        <div class="form-group">
+          <label for="industry">Industry</label>
+          <select id="industry" name="industry" required>
+            <option value="" disabled>Select industry</option>
+            <option value="it" {% if company.industry == 'it' %}selected{% endif %}>Information Technology</option>
+            <option value="finance" {% if company.industry == 'finance' %}selected{% endif %}>Finance & Banking</option>
+            <option value="consulting" {% if company.industry == 'consulting' %}selected{% endif %}>Consulting</option>
+            <option value="manufacturing" {% if company.industry == 'manufacturing' %}selected{% endif %}>Manufacturing</option>
+            <option value="healthcare" {% if company.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+            <option value="ecommerce" {% if company.industry == 'ecommerce' %}selected{% endif %}>E-commerce & Retail</option>
+            <option value="other" {% if company.industry == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location" value="{{ company.location }}" required>
+        </div>
+      </div>
+      
+      <div class="form-column">
+        <div class="form-group">
+          <label for="website">Website</label>
+          <input type="text" id="website" name="website" value="{{ company.website or '' }}">
+        </div>
+        <div class="form-group">
+          <label for="phone">Contact Number</label>
+          <input type="tel" id="phone" name="phone" value="{{ company.phone }}" required>
+        </div>
+        <div class="form-group">
+          <label for="hr_name">HR Contact Person</label>
+          <input type="text" id="hr_name" name="hr_name" value="{{ company.hr_name }}" required>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Company Description</label>
+      <textarea id="description" name="description" rows="4" required>{{ company.description or '' }}</textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="logo">Company Logo</label>
+      <input type="file" id="logo" name="logo" accept="image/*">
+      {% if company.logo_path %}
+      <div class="company-logo-preview">
+        <img src="{{ company.logo_path }}" alt="{{ company.company_name }} Logo">
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="form-group">
+      <button type="submit" class="btn"><i class="fas fa-save"></i> Update Profile</button>
+    </div>
+  </form>
+</section>
+
+<section id="jobs-tab" class="card" style="display: none;">
+  <h3><i class="fas fa-briefcase"></i> Job Postings</h3>
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="showJobForm()"><i class="fas fa-plus"></i> Post New Job</button>
+  </div>
+  
+  <div id="job-form-container" style="display: none;">
+    <form id="job-form" action="{{ url_for('post_job') }}" method="POST">
+      <h4>New Job Posting</h4>
+      
+      <div class="form-row">
+        <div class="form-column">
+          <div class="form-group">
+            <label for="title">Job Title</label>
+            <input type="text" id="title" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="job_type">Job Type</label>
+            <select id="job_type" name="job_type" required>
+              <option value="" disabled selected>Select job type</option>
+              <option value="full-time">Full-time</option>
+              <option value="internship">Internship</option>
+              <option value="contract">Contract</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" required>
+          </div>
+        </div>
+        
+        <div class="form-column">
+          <div class="form-group">
+            <label for="compensation">Compensation</label>
+            <input type="text" id="compensation" name="compensation" placeholder="E.g., ₹8-10 LPA" required>
+          </div>
+          <div class="form-group">
+            <label for="positions">Number of Positions</label>
+            <input type="number" id="positions" name="positions" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="cgpa_cutoff">CGPA Cutoff</label>
+            <input type="number" id="cgpa_cutoff" name="cgpa_cutoff" min="0" max="10" step="0.01" required>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Job Description</label>
+        <textarea id="description" name="description" rows="3" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="requirements">Requirements</label>
+        <textarea id="requirements" name="requirements" rows="3" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="skills">Required Skills (separated by commas)</label>
+        <input type="text" id="skills" name="skills" placeholder="E.g., Java, Python, AWS">
+      </div>
+      
+      <div class="form-group">
+        <label for="deadline">Application Deadline</label>
+        <input type="date" id="deadline" name="deadline">
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="hideJobForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Post Job</button>
+      </div>
+    </form>
+  </div>
+  
+  {% if jobs %}
+    <div class="jobs-list">
+      {% for job in jobs %}
+      <div class="job-item">
+        <div class="job-header">
+          <h4>{{ job.title }}</h4>
+          <div class="job-status">
+            <span class="status-badge status-{{ 'active' if job.is_active else 'inactive' }}">{{ 'Active' if job.is_active else 'Inactive' }}</span>
+            <span class="status-badge status-{{ 'approved' if job.is_approved else 'pending' }}">{{ 'Approved' if job.is_approved else 'Pending Approval' }}</span>
+          </div>
+        </div>
+        
+        <div class="job-details">
+          <p><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+          <p><i class="fas fa-money-bill-wave"></i> {{ job.compensation }}</p>
+          <p><i class="fas fa-users"></i> {{ job.positions }} position(s)</p>
+          <p><i class="fas fa-graduation-cap"></i> Min. CGPA: {{ job.cgpa_cutoff }}</p>
+          {% if job.deadline %}
+          <p><i class="fas fa-calendar-alt"></i> Deadline: {{ job.deadline.strftime('%Y-%m-%d') }}</p>
+          {% endif %}
+        </div>
+        
+        <div class="job-actions">
+          <button class="btn btn-sm" onclick="viewApplications({{ job.id }})"><i class="fas fa-users"></i> Applications ({{ job.applications|length }})</button>
+          <button class="btn btn-sm btn-outline" onclick="editJob({{ job.id }})"><i class="fas fa-edit"></i> Edit</button>
+          <button class="btn btn-sm btn-outline {{ 'danger' if job.is_active else 'success' }}" onclick="toggleJobStatus({{ job.id }})">
+            <i class="fas {{ 'fa-times' if job.is_active else 'fa-check' }}"></i> {{ 'Deactivate' if job.is_active else 'Activate' }}
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-briefcase empty-icon"></i>
+      <p>You haven't posted any jobs yet.</p>
+      <button class="btn" onclick="showJobForm()"><i class="fas fa-plus"></i> Post your first job</button>
+    </div>
+  {% endif %}
+</section>
+
+<section id="applications-tab" class="card" style="display: none;">
+  <h3><i class="fas fa-clipboard-list"></i> Applications</h3>
+  
+  <div id="applications-container">
+    {% if jobs and jobs|selectattr('applications')|list|length > 0 %}
+      <div class="filters">
+        <select id="job-filter">
+          <option value="all">All Jobs</option>
+          {% for job in jobs %}
+          <option value="{{ job.id }}">{{ job.title }}</option>
+          {% endfor %}
+        </select>
+        <select id="status-filter">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="interviewed">Interviewed</option>
+          <option value="offered">Offered</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      
+      <div class="table-container">
+        <table class="data-table" id="applications-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Job Title</th>
+              <th>Applied Date</th>
+              <th>CGPA</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+              {% for application in job.applications %}
+              <tr data-job-id="{{ job.id }}" data-status="{{ application.status }}">
+                <td>{{ application.student.full_name }}</td>
+                <td>{{ job.title }}</td>
+                <td>{{ application.applied_at.strftime('%Y-%m-%d') }}</td>
+                <td>{{ application.student.cgpa }}</td>
+                <td><span class="status-badge status-{{ application.status }}">{{ application.status|capitalize }}</span></td>
+                <td class="actions-cell">
+                  <button class="btn btn-sm" onclick="viewStudentProfile({{ application.student.id }})"><i class="fas fa-user"></i></button>
+                  <select class="status-select" onchange="updateApplicationStatus({{ application.id }}, this.value)">
+                    <option value="">Update Status</option>
+                    <option value="pending" {% if application.status == 'pending' %}disabled{% endif %}>Pending</option>
+                    <option value="shortlisted" {% if application.status == 'shortlisted' %}disabled{% endif %}>Shortlisted</option>
+                    <option value="interviewed" {% if application.status == 'interviewed' %}disabled{% endif %}>Interviewed</option>
+                    <option value="offered" {% if application.status == 'offered' %}disabled{% endif %}>Offer</option>
+                    <option value="rejected" {% if application.status == 'rejected' %}disabled{% endif %}>Reject</option>
+                  </select>
+                </td>
+              </tr>
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-clipboard-list empty-icon"></i>
+        <p>You haven't received any applications yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="notifications-tab" class="card" style="display: none;">
+  <h3><i class="fas fa-bell"></i> Notifications</h3>
+  <div id="notifications-container">
+    {% if notifications %}
+      <div class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+          <div class="notification-content">
+            <p>{{ notification.message }}</p>
+            <span class="notification-time">{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+          </div>
+          {% if not notification.is_read %}
+          <button class="mark-read-btn" onclick="markAsRead({{ notification.id }})">
+            <i class="fas fa-check"></i>
+          </button>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-bell-slash empty-icon"></i>
+        <p>No notifications to display.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="logout-section">
+  <a href="{{ url_for('logout') }}" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Tab switching functionality
+  function showTab(tabName) {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('section[id$="-tab"]');
+    
+    // Remove active class from all tabs
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Hide all tab contents
+    tabContents.forEach(content => content.style.display = 'none');
+    
+    // Add active class to the selected tab
+    document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+    
+    // Show the selected tab content
+    document.getElementById(`${tabName}-tab`).style.display = 'block';
+  }
+  
+  // Job form handling
+  function showJobForm() {
+    document.getElementById('job-form-container').style.display = 'block';
+  }
+  
+  function hideJobForm() {
+    document.getElementById('job-form-container').style.display = 'none';
+  }
+  
+  // Job actions
+  function editJob(jobId) {
+    // In a real implementation, you would pre-fill the form with job details
+    alert(`Edit job ID: ${jobId}`);
+    showJobForm();
+  }
+  
+  function toggleJobStatus(jobId) {
+    fetch(`/api/jobs/${jobId}/toggle-status`, {
+      method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    });
+  }
+  
+  function viewApplications(jobId) {
+    showTab('applications');
+    document.getElementById('job-filter').value = jobId;
+    filterApplications();
+  }
+  
+  // Application handling
+  function viewStudentProfile(studentId) {
+    // Open a modal with student details
+    fetch(`/api/student-profile/${studentId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Display student profile in modal
+        alert(`View student profile ID: ${studentId}`);
+      }
+    });
+  }
+  
+  function updateApplicationStatus(applicationId, status) {
+    fetch(`/api/company/update-application-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        application_id: applicationId,
+        status: status
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update the UI
+        const statusCell = document.querySelector(`select[onchange*="${applicationId}"]`).closest('tr').querySelector('td:nth-child(5) span');
+        statusCell.className = `status-badge status-${status}`;
+        statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    });
+  }
+  
+  // Application filtering
+  document.addEventListener('DOMContentLoaded', function() {
+    const jobFilter = document.getElementById('job-filter');
+    const statusFilter = document.getElementById('status-filter');
+    
+    if (jobFilter && statusFilter) {
+      jobFilter.addEventListener('change', filterApplications);
+      statusFilter.addEventListener('change', filterApplications);
+    }
+    
+    function filterApplications() {
+      const jobId = jobFilter.value;
+      const status = statusFilter.value;
+      const rows = document.querySelectorAll('#applications-table tbody tr');
+      
+      rows.forEach(row => {
+        const rowJobId = row.dataset.jobId;
+        const rowStatus = row.dataset.status;
+        
+        const matchesJob = jobId === 'all' || rowJobId === jobId;
+        const matchesStatus = status === 'all' || rowStatus === status;
+        
+        row.style.display = (matchesJob && matchesStatus) ? '' : 'none';
+      });
+    }
+  });
+  
+  // Notification functionality
+  function markAsRead(notificationId) {
+    fetch(`/api/notifications/read/${notificationId}`, {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.querySelector(`.notification-item button[onclick="markAsRead(${notificationId})"]`).parentElement.classList.remove('unread');
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-university"></i> PlacementHub
+    </div>
+
+    <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+      <div class="tab" onclick="showTab('students')">Students</div>
+      <div class="tab" onclick="showTab('companies')">Companies</div>
+      <div class="tab" onclick="showTab('approvals')">Approvals</div>
+      <div class="tab" onclick="showTab('reports')">Reports</div>
+    </div>
+    
+    <section id="dashboard-tab" class="card">
+      <h3><i class="fas fa-tachometer-alt"></i> Overview</h3>
+      
+      <div class="analytics-cards">
+        <div class="analytics-card">
+          <h4>156</h4>
+          <p>Total Students</p>
+        </div>
+        <div class="analytics-card">
+          <h4>24</h4>
+          <p>Companies</p>
+        </div>
+        <div class="analytics-card">
+          <h4>47</h4>
+          <p>Job Postings</p>
+        </div>
+        <div class="analytics-card">
+          <h4>112</h4>
+          <p>Placements</p>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-column">
+          <h4 class="mt-4"><i class="fas fa-bell"></i> Recent Activities</h4>
+          <ul class="activity-list">
+            <li>
+              <span class="activity-time">Today, 10:24 AM</span>
+              <div class="activity-content">
+                <p><strong>Tech Solutions Inc.</strong> posted a new job: Software Engineer</p>
+              </div>
+            </li>
+            <li>
+              <span class="activity-time">Yesterday, 3:45 PM</span>
+              <div class="activity-content">
+                <p><strong>John Doe</strong> updated his student profile</p>
+              </div>
+            </li>
+            <li>
+              <span class="activity-time">May 28, 2025</span>
+              <div class="activity-content">
+                <p><strong>Innovate Systems</strong> registered as a new company</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="form-column">
+          <h4 class="mt-4"><i class="fas fa-check-circle"></i> Pending Approvals</h4>
+          <div class="approval-summary">
+            <div class="approval-item">
+              <span>Student Registrations</span>
+              <span class="badge">12</span>
+            </div>
+            <div class="approval-item">
+              <span>Company Registrations</span>
+              <span class="badge">3</span>
+            </div>
+            <div class="approval-item">
+              <span>Job Postings</span>
+              <span class="badge">5</span>
+            </div>
+          </div>
+          <button class="btn-small view-all-btn"><i class="fas fa-eye"></i> View All</button>
+        </div>
+      </div>
+      
+      <h4 class="mt-4"><i class="fas fa-chart-pie"></i> Placement Statistics</h4>
+      <div class="chart-container">
+        <div class="chart-placeholder">
+          <!-- This would normally be a chart using a library like Chart.js -->
+          <div class="pie-chart-container">
+            <div class="pie-chart">
+              <div class="slice slice1" title="Computer Science: 65%"></div>
+              <div class="slice slice2" title="Information Technology: 20%"></div>
+              <div class="slice slice3" title="Electronics: 10%"></div>
+              <div class="slice slice4" title="Others: 5%"></div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><span class="color-box color1"></span> Computer Science (65%)</div>
+            <div class="legend-item"><span class="color-box color2"></span> Information Technology (20%)</div>
+            <div class="legend-item"><span class="color-box color3"></span> Electronics (10%)</div>
+            <div class="legend-item"><span class="color-box color4"></span> Others (5%)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="students-tab" class="card" style="display: none;">
+      <h3><i class="fas fa-user-graduate"></i> Student Management</h3>
+      
+      <div class="search-filter">
+        <select>
+          <option value="">All Departments</option>
+          <option value="cs">Computer Science</option>
+          <option value="it">Information Technology</option>
+          <option value="ec">Electronics & Communication</option>
+          <option value="ee">Electrical Engineering</option>
+        </select>
+        <select>
+          <option value="">All Years</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+        </select>
+        <input type="text" placeholder="Search by name or ID">
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>USN/ID</th>
+            <th>Department</th>
+            <th>CGPA</th>
+            <th>Grad. Year</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John Doe</td>
+            <td>CSE123</td>
+            <td>Computer Science</td>
+            <td>8.7</td>
+            <td>2025</td>
+            <td><span class="status placed">Placed</span></td>
+            <td>
+              <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>ISE456</td>
+            <td>Information Technology</td>
+            <td>9.2</td>
+            <td>2025</td>
+            <td><span class="status placed">Placed</span></td>
+            <td>
+              <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td>Alex Johnson</td>
+            <td>ECE789</td>
+            <td>Electronics</td>
+            <td>7.9</td>
+            <td>2025</td>
+            <td><span class="status not-placed">Not Placed</span></td>
+            <td>
+              <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination">
+        <button>&laquo;</button>
+        <button class="active">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>&raquo;</button>
+      </div>
+    </section>
+    
+    <section id="companies-tab" class="card" style="display: none;">
+      <h3><i class="fas fa-building"></i> Company Management</h3>
+      
+      <div class="search-filter">
+        <select>
+          <option value="">All Industries</option>
+          <option value="it">Information Technology</option>
+          <option value="finance">Finance & Banking</option>
+          <option value="consulting">Consulting</option>
+        </select>
+        <input type="text" placeholder="Search by company name">
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Company Name</th>
+            <th>Industry</th>
+            <th>Location</th>
+            <th>Job Postings</th>
+            <th>Selections</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tech Solutions Inc.</td>
+            <td>Information Technology</td>
+            <td>Bangalore</td>
+            <td>3</td>
+            <td>5</td>
+            <td>
+              <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td>Finance Pro Ltd.</td>
+            <td>Finance</td>
+            <td>Mumbai</td>
+            <td>2</td>
+            <td>3</td>
+            <td>
+              <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination">
+        <button>&laquo;</button>
+        <button class="active">1</button>
+        <button>2</button>
+        <button>&raquo;</button>
+      </div>
+    </section>
+    
+    <section id="approvals-tab" class="card" style="display: none;">
+      <h3><i class="fas fa-check-double"></i> Pending Approvals</h3>
+      
+      <div class="tabs sub-tabs">
+        <div class="tab sub-tab active" onclick="showSubTab('student-approval')">Students (12)</div>
+        <div class="tab sub-tab" onclick="showSubTab('company-approval')">Companies (3)</div>
+        <div class="tab sub-tab" onclick="showSubTab('job-approval')">Job Postings (5)</div>
+      </div>
+      
+      <div id="student-approval-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>CGPA</th>
+              <th>Email</th>
+              <th>Registration Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Michael Brown</td>
+              <td>Computer Science</td>
+              <td>8.5</td>
+              <td>michael@example.com</td>
+              <td>May 29, 2025</td>
+              <td>
+                <button class="btn-small approve-btn"><i class="fas fa-check"></i> Approve</button>
+                <button class="btn-small reject-btn"><i class="fas fa-times"></i> Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Emily Wilson</td>
+              <td>Information Technology</td>
+              <td>9.0</td>
+              <td>emily@example.com</td>
+              <td>May 28, 2025</td>
+              <td>
+                <button class="btn-small approve-btn"><i class="fas fa-check"></i> Approve</button>
+                <button class="btn-small reject-btn"><i class="fas fa-times"></i> Reject</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="company-approval-tab" style="display: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Industry</th>
+              <th>Location</th>
+              <th>Contact Person</th>
+              <th>Registration Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Innovate Systems</td>
+              <td>Information Technology</td>
+              <td>Hyderabad</td>
+              <td>Sarah Johnson</td>
+              <td>May 28, 2025</td>
+              <td>
+                <button class="btn-small approve-btn"><i class="fas fa-check"></i> Approve</button>
+                <button class="btn-small reject-btn"><i class="fas fa-times"></i> Reject</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="job-approval-tab" style="display: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Company</th>
+              <th>CTC/Stipend</th>
+              <th>CGPA Cutoff</th>
+              <th>Posting Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ML Engineer</td>
+              <td>Tech Solutions Inc.</td>
+              <td>12-15 LPA</td>
+              <td>8.0</td>
+              <td>May 29, 2025</td>
+              <td>
+                <button class="btn-small approve-btn"><i class="fas fa-check"></i> Approve</button>
+                <button class="btn-small reject-btn"><i class="fas fa-times"></i> Reject</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <section id="reports-tab" class="card" style="display: none;">
+      <h3><i class="fas fa-file-alt"></i> Reports & Analytics</h3>
+      
+      <div class="form-row">
+        <div class="form-column">
+          <div class="form-group">
+            <select id="report-type">
+              <option value="" disabled selected>Select Report Type</option>
+              <option value="placement-summary">Placement Summary</option>
+              <option value="company-wise">Company-wise Placements</option>
+              <option value="department-wise">Department-wise Placements</option>
+              <option value="salary-analysis">Salary Analysis</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-column">
+          <div class="form-group">
+            <select id="report-year">
+              <option value="" disabled selected>Select Academic Year</option>
+              <option value="2024-2025">2024-2025</option>
+              <option value="2023-2024">2023-2024</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <button id="generate-report"><i class="fas fa-chart-bar"></i> Generate Report</button>
+      </div>
+      
+      <div id="report-container" class="mt-4">
+        <h4>Placement Summary - Academic Year 2024-2025</h4>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <h5>92%</h5>
+            <p>Placement Percentage</p>
+          </div>
+          <div class="summary-stat">
+            <h5>₹8.2 LPA</h5>
+            <p>Average CTC</p>
+          </div>
+          <div class="summary-stat">
+            <h5>₹22 LPA</h5>
+            <p>Highest CTC</p>
+          </div>
+          <div class="summary-stat">
+            <h5>24</h5>
+            <p>Recruiting Companies</p>
+          </div>
+        </div>
+        
+        <table class="data-table mt-4">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Total Students</th>
+              <th>Placed</th>
+              <th>Placement %</th>
+              <th>Avg. CTC</th>
+              <th>Highest CTC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Computer Science</td>
+              <td>60</td>
+              <td>58</td>
+              <td>96.7%</td>
+              <td>₹10.2 LPA</td>
+              <td>₹22 LPA</td>
+            </tr>
+            <tr>
+              <td>Information Technology</td>
+              <td>45</td>
+              <td>42</td>
+              <td>93.3%</td>
+              <td>₹9.5 LPA</td>
+              <td>₹18 LPA</td>
+            </tr>
+            <tr>
+              <td>Electronics</td>
+              <td>40</td>
+              <td>34</td>
+              <td>85.0%</td>
+              <td>₹7.8 LPA</td>
+              <td>₹15 LPA</td>
+            </tr>
+            <tr>
+              <td>Electrical</td>
+              <td>35</td>
+              <td>30</td>
+              <td>85.7%</td>
+              <td>₹7.5 LPA</td>
+              <td>₹14 LPA</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="form-group mt-4">
+          <button class="btn-small"><i class="fas fa-file-pdf"></i> Export as PDF</button>
+          <button class="btn-small"><i class="fas fa-file-excel"></i> Export as Excel</button>
+        </div>
+      </div>
+    </section>
+    
+    <div class="form-footer">
+      <a href="index.html" class="btn home-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('section[id$="-tab"]').forEach(tab => {
+        tab.style.display = 'none';
+      });
+      
+      // Remove active class from all tab buttons
+      document.querySelectorAll('.tab:not(.sub-tab)').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected tab
+      document.getElementById(tabName + '-tab').style.display = 'block';
+      
+      // Set active class for the clicked tab button
+      document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+    }
+    
+    function showSubTab(tabName) {
+      // Hide all subtabs
+      document.querySelectorAll('[id$="-approval-tab"]').forEach(tab => {
+        tab.style.display = 'none';
+      });
+      
+      // Remove active class from all subtab buttons
+      document.querySelectorAll('.sub-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected subtab
+      document.getElementById(tabName + '-tab').style.display = 'block';
+      
+      // Set active class for the clicked subtab button
+      document.querySelector(`.sub-tab[onclick="showSubTab('${tabName}')"]`).classList.add('active');
+    }
+    
+    // Report generation simulation
+    document.addEventListener('DOMContentLoaded', function() {
+      const generateReportBtn = document.getElementById('generate-report');
+      if (generateReportBtn) {
+        generateReportBtn.addEventListener('click', function() {
+          alert('Report generated successfully!');
+        });
+      }
+      
+      // Approval buttons
+      document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const row = this.closest('tr');
+          row.classList.add('fade-out');
+          setTimeout(() => {
+            row.style.display = 'none';
+          }, 500);
+          alert('Approved successfully!');
+        });
+      });
+      
+      document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const row = this.closest('tr');
+          row.classList.add('fade-out');
+          setTimeout(() => {
+            row.style.display = 'none';
+          }, 500);
+          alert('Rejected successfully!');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

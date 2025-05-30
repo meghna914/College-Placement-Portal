@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Database Viewer{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-database"></i> Database Viewer</h2>
+
+<div class="db-container">
+  <div class="db-sidebar card">
+    <h3>Database Tables</h3>
+    <ul class="db-table-list">
+      {% for table in db_tables %}
+        <li class="db-table-item {% if table.name == selected_table %}active{% endif %}">
+          <a href="{{ url_for('view_database_table', table_name=table.name) }}">
+            <i class="fas fa-table"></i> {{ table.name }}
+            <span class="badge">{{ table.count }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    
+    <div class="db-actions">
+      <a href="{{ url_for('backup_database') }}" class="btn btn-sm"><i class="fas fa-download"></i> Backup Database</a>
+      <button class="btn btn-sm btn-outline" onclick="if(confirm('Are you sure you want to reset test data?')) window.location.href='{{ url_for('reset_test_data') }}'"><i class="fas fa-redo"></i> Reset Test Data</button>
+    </div>
+  </div>
+  
+  <div class="db-content card">
+    {% if selected_table %}
+      <h3>Table: {{ selected_table }}</h3>
+      
+      {% if table_data %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                {% for column in table_data.columns %}
+                  <th>{{ column }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in table_data.rows %}
+                <tr>
+                  {% for column in table_data.columns %}
+                    <td>{{ row[column] if row[column] is not none else '' }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-database empty-icon"></i>
+          <p>No data available in this table.</p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-database empty-icon"></i>
+        <p>Select a table from the list to view its contents.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="back-to-dashboard">
+  <a href="{{ url_for('admin_dashboard') }}" class="btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .db-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .db-sidebar {
+    padding: 20px;
+  }
+  
+  .db-table-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .db-table-item {
+    margin-bottom: 5px;
+  }
+  
+  .db-table-item a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+  
+  .db-table-item a:hover,
+  .db-table-item.active a {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color);
+  }
+  
+  .badge {
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+  }
+  
+  .db-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .db-content {
+    padding: 20px;
+  }
+  
+  .back-to-dashboard {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+</style>
+{% endblock %}
