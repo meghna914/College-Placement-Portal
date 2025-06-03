@@ -2,6 +2,9 @@
 
 {% block title %}Register - Placement Portal{% endblock %}
 
+{% block body_class %}landing-page{% endblock %}
+{% block container_class %}landing-container{% endblock %}
+
 {% block content %}
 <div class="tabs">
   <div class="tab" onclick="switchToLogin()">Login</div>
@@ -18,12 +21,12 @@
           <input type="text" id="student-name" name="student-name" placeholder="Enter your full name" required>
         </div>
         <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+          <label for="student-email">Email Address</label>
+          <input type="email" id="student-email" name="email" placeholder="Enter your email address" required>
         </div>
         <div class="form-group">
-          <label for="password">Create Password</label>
-          <input type="password" id="password" name="password" placeholder="Create a secure password" required>
+          <label for="student-password">Create Password</label>
+          <input type="password" id="student-password" name="password" placeholder="Create a secure password" required>
         </div>
         <div class="form-group">
           <label for="student-confirm-password">Confirm Password</label>
@@ -98,12 +101,12 @@
           <input type="text" id="company-name" name="company-name" placeholder="Enter company name" required>
         </div>
         <div class="form-group">
-          <label for="email">Company Email</label>
-          <input type="email" id="email" name="email" placeholder="Enter company email" required>
+          <label for="company-email">Company Email</label>
+          <input type="email" id="company-email" name="email" placeholder="Enter company email" required>
         </div>
         <div class="form-group">
-          <label for="password">Create Password</label>
-          <input type="password" id="password" name="password" placeholder="Create a secure password" required>
+          <label for="company-password">Create Password</label>
+          <input type="password" id="company-password" name="password" placeholder="Create a secure password" required>
         </div>
         <div class="form-group">
           <label for="company-confirm-password">Confirm Password</label>
@@ -178,25 +181,74 @@
     const companyForm = document.getElementById('company-form');
     
     studentForm.addEventListener('submit', function(e) {
-      const password = document.getElementById('password').value;
+      const password = document.getElementById('student-password').value;
       const confirmPassword = document.getElementById('student-confirm-password').value;
-      
+
       if (password !== confirmPassword) {
         e.preventDefault();
-        alert('Passwords do not match!');
+        showFieldError(document.getElementById('student-confirm-password'), 'Passwords do not match!');
+        return false;
       }
     });
-    
+
     companyForm.addEventListener('submit', function(e) {
-      const password = document.getElementById('password').value;
+      const password = document.getElementById('company-password').value;
       const confirmPassword = document.getElementById('company-confirm-password').value;
-      
+
       if (password !== confirmPassword) {
         e.preventDefault();
-        alert('Passwords do not match!');
+        showFieldError(document.getElementById('company-confirm-password'), 'Passwords do not match!');
+        return false;
       }
     });
+
+    // Add real-time password confirmation validation
+    const studentConfirmPassword = document.getElementById('student-confirm-password');
+    const companyConfirmPassword = document.getElementById('company-confirm-password');
+
+    if (studentConfirmPassword) {
+      studentConfirmPassword.addEventListener('input', function() {
+        const password = document.getElementById('student-password').value;
+        const confirmPassword = this.value;
+
+        clearFieldError(this);
+        if (confirmPassword && password !== confirmPassword) {
+          showFieldError(this, 'Passwords do not match!');
+        }
+      });
+    }
+
+    if (companyConfirmPassword) {
+      companyConfirmPassword.addEventListener('input', function() {
+        const password = document.getElementById('company-password').value;
+        const confirmPassword = this.value;
+
+        clearFieldError(this);
+        if (confirmPassword && password !== confirmPassword) {
+          showFieldError(this, 'Passwords do not match!');
+        }
+      });
+    }
   });
+
+  // Field validation helper functions
+  function showFieldError(field, message) {
+    clearFieldError(field);
+
+    field.classList.add('error');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'field-error';
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+  }
+
+  function clearFieldError(field) {
+    field.classList.remove('error');
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+      existingError.remove();
+    }
+  }
   
   function switchToLogin() {
     const params = new URLSearchParams(window.location.search);

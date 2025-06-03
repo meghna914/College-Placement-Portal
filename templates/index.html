@@ -2,17 +2,63 @@
 
 {% block title %}College Placement Portal{% endblock %}
 
+{% block body_class %}landing-page{% endblock %}
+{% block container_class %}landing-container{% endblock %}
+
 {% block content %}
+<!-- Header -->
+<header class="main-header">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <a href="{{ url_for('index') }}">
+        <i class="fas fa-university"></i>
+        <span class="brand-text"><span class="highlight">Placement</span>Hub</span>
+      </a>
+    </div>
+    <div class="nav-menu">
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#testimonials" class="nav-link">Testimonials</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <div class="nav-buttons">
+        <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+    </div>
+    <div class="mobile-menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+</header>
+
+<!-- Loading Screen -->
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+  </div>
+  <p class="loading-text">Loading Amazing Experience...</p>
+</div>
+
 <div class="animated-background">
   <div class="animation-circle circle1"></div>
   <div class="animation-circle circle2"></div>
   <div class="animation-circle circle3"></div>
+  <div class="floating-particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
 </div>
 
 <div class="hero-section">
   <div class="hero-badge"><i class="fas fa-award"></i> Premier Placement Platform</div>
-  <h1 class="gradient-text">Launching Careers, <br>Connecting Futures</h1>
-  <p>Connect with top companies, showcase your skills, and find your dream job through our streamlined placement platform.</p>
+  <h1 class="gradient-text">Launching Careers, <br><span class="typing-text">Connecting Futures</span></h1>
+  <p class="hero-description">Connect with top companies, showcase your skills, and find your dream job through our streamlined placement platform.</p>
   
   <div class="hero-cta">
     <a href="{{ url_for('register', role='student') }}" class="btn btn-large pulse-animation"><i class="fas fa-rocket"></i> Get Started</a>
@@ -330,6 +376,17 @@
 <script src="{{ url_for('static', filename='js/index-animations.js') }}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Hide loading screen after page loads
+    setTimeout(() => {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+          loadingScreen.remove();
+        }, 500);
+      }
+    }, 1500);
+
     // Counter animation for stats
     const counters = document.querySelectorAll('.counter');
     const speed = 200;
@@ -407,22 +464,48 @@
       });
     });
     
-    // Animation on scroll
-    const elements = document.querySelectorAll('.card, .step, .testimonial, .hero-stat, .section-title');
-    
+    // Enhanced animation on scroll
+    const elements = document.querySelectorAll('.card, .step, .testimonial, .hero-stat, .section-title, .hero-description, .hero-cta');
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate');
+          // Add staggered animation for multiple elements
+          if (entry.target.classList.contains('hero-stat')) {
+            const index = Array.from(entry.target.parentNode.children).indexOf(entry.target);
+            entry.target.style.animationDelay = `${index * 0.2}s`;
+          }
           observer.unobserve(entry.target);
         }
       });
     }, {
-      threshold: 0.2
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
     });
-    
+
     elements.forEach(element => {
       observer.observe(element);
+    });
+
+    // Add parallax effect to hero section
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const parallax = document.querySelector('.animated-background');
+      const speed = scrolled * 0.5;
+
+      if (parallax) {
+        parallax.style.transform = `translateY(${speed}px)`;
+      }
+    });
+
+    // Add smooth reveal animations
+    const revealElements = document.querySelectorAll('.card, .step');
+    revealElements.forEach((element, index) => {
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+      element.style.transition = 'all 0.6s ease';
+      element.style.transitionDelay = `${index * 0.1}s`;
     });
   });
 </script>

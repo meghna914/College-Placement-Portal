@@ -2,24 +2,47 @@
 
 {% block title %}Student Dashboard{% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+{% block container_class %}dashboard-container{% endblock %}
+
 {% block content %}
-<h2><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <h2><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+      <p class="header-subtitle">Manage your profile and track opportunities</p>
+    </div>
+    <div class="header-right">
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ applications|length }}</span>
+          <span class="stat-label">Applications</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ eligible_jobs|length }}</span>
+          <span class="stat-label">Opportunities</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="user-greeting">
-  <h3>Welcome, {{ student.full_name }}!</h3>
-  <p>Student ID: {{ student.student_id }}</p>
+  <h3>Welcome back, {{ student.full_name }}!</h3>
+  <p>Student ID: {{ student.student_id }} | Ready to explore new opportunities?</p>
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('profile')">Profile</div>
-  <div class="tab" onclick="showTab('applications')">Applications</div>
-  <div class="tab" onclick="showTab('opportunities')">Opportunities</div>
-  <div class="tab" onclick="showTab('notifications')">Notifications</div>
+  <div class="tab active" onclick="showTab('profile')"><i class="fas fa-id-card"></i> Profile</div>
+  <div class="tab" onclick="showTab('applications')"><i class="fas fa-clipboard-list"></i> Applications</div>
+  <div class="tab" onclick="showTab('opportunities')"><i class="fas fa-briefcase"></i> Opportunities</div>
+  <div class="tab" onclick="showTab('notifications')"><i class="fas fa-bell"></i> Notifications</div>
 </div>
 
 <section id="profile-tab" class="card">
   <h3><i class="fas fa-id-card"></i> Student Profile</h3>
-  <form id="profile-form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+  <form id="profile-form" enctype="multipart/form-data">
     <div class="form-row">
       <div class="form-column">
         <div class="form-group">
@@ -68,19 +91,19 @@
     
     <div class="form-group">
       <label for="skills">Skills (separated by commas)</label>
-      <input type="text" id="skills" name="skills" placeholder="e.g., Java, Python, Machine Learning" value="{{ student.skills|join(', ') if student.skills }}">
+      <input type="text" id="skills" name="skills" placeholder="e.g., Java, Python, Machine Learning" value="{% for skill in skills %}{{ skill.name }}{% if not loop.last %}, {% endif %}{% endfor %}">
     </div>
-    
+
     <div class="form-group">
       <label for="resume">Resume (PDF)</label>
       <input type="file" id="resume" name="resume" accept=".pdf">
       {% if student.resume_path %}
-      <p class="file-info">Current resume: <a href="{{ student.resume_path }}" target="_blank">View Resume</a></p>
+      <p class="file-info">Current resume: <a href="{{ student.resume_path }}" target="_blank"><i class="fas fa-file-pdf"></i> View Resume</a></p>
       {% endif %}
     </div>
-    
+
     <div class="form-group">
-      <button type="submit" class="btn"><i class="fas fa-save"></i> Update Profile</button>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Profile</button>
     </div>
   </form>
 </section>
@@ -153,8 +176,8 @@
           {% endif %}
         </div>
         <div class="job-actions">
-          <button class="btn view-job-btn" onclick="viewJobDetails({{ job.id }})">View Details</button>
-          <button class="btn btn-primary apply-btn" onclick="applyForJob({{ job.id }})">Apply Now</button>
+          <button class="btn btn-outline btn-sm" onclick="viewJobDetails({{ job.id }})"><i class="fas fa-eye"></i> View Details</button>
+          <button class="btn btn-success btn-sm" onclick="applyForJob({{ job.id }})"><i class="fas fa-paper-plane"></i> Apply Now</button>
         </div>
       </div>
       {% endfor %}
@@ -221,63 +244,161 @@
     document.getElementById(`${tabName}-tab`).style.display = 'block';
   }
   
-  // Job filtering
+  // Initialize dashboard functionality
   document.addEventListener('DOMContentLoaded', function() {
+    // Handle profile form submission
+    const profileForm = document.getElementById('profile-form');
+    if (profileForm) {
+      profileForm.addEventListener('submit', handleProfileSubmit);
+    }
+
+    // Job filtering
     const searchInput = document.getElementById('job-search');
     const typeFilter = document.getElementById('job-type-filter');
-    
+
     if (searchInput && typeFilter) {
       function filterJobs() {
         const searchTerm = searchInput.value.toLowerCase();
         const jobType = typeFilter.value.toLowerCase();
         const jobCards = document.querySelectorAll('.job-card');
-        
+
         jobCards.forEach(card => {
           const title = card.querySelector('h4').textContent.toLowerCase();
           const company = card.querySelector('.company-name').textContent.toLowerCase();
           const cardJobType = card.dataset.jobType;
-          
+
           const matchesSearch = title.includes(searchTerm) || company.includes(searchTerm);
           const matchesType = jobType === '' || cardJobType === jobType;
-          
+
           card.style.display = (matchesSearch && matchesType) ? 'block' : 'none';
         });
       }
-      
+
       searchInput.addEventListener('input', filterJobs);
       typeFilter.addEventListener('change', filterJobs);
     }
   });
+
+  // Handle profile form submission with AJAX
+  async function handleProfileSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const formData = new FormData(form);
+
+    // Set loading state
+    PlacementPortal.setLoadingState(submitBtn, true);
+
+    try {
+      const response = await fetch('/api/update-profile', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        PlacementPortal.showFlashMessage('Profile updated successfully!', 'success');
+        // Optionally reload the page to show updated data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        PlacementPortal.showFlashMessage(result.message || 'Failed to update profile', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      PlacementPortal.showFlashMessage('An error occurred while updating your profile.', 'error');
+    } finally {
+      PlacementPortal.setLoadingState(submitBtn, false);
+    }
+  }
   
   // Job application functionality
   function viewJobDetails(jobId) {
-    // Open job details modal or page
-    alert(`View details for job ID: ${jobId}`);
-    // In a real implementation, you would show a modal with job details
+    // Create and show modal with job details
+    showJobDetailsModal(jobId);
   }
-  
-  function applyForJob(jobId) {
-    // Send AJAX request to apply for job
-    fetch(`/api/apply/${jobId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Application submitted successfully!');
-        // Reload the applications tab
-        window.location.reload();
+
+  async function applyForJob(jobId) {
+    const button = event.target;
+    const originalContent = button.innerHTML;
+
+    // Set loading state
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+
+    try {
+      const result = await PlacementPortal.makeApiCall(`/api/apply/${jobId}`, {
+        method: 'POST'
+      });
+
+      if (result.success) {
+        PlacementPortal.showFlashMessage('Application submitted successfully!', 'success');
+        // Update button state
+        button.innerHTML = '<i class="fas fa-check"></i> Applied';
+        button.classList.remove('btn-success');
+        button.classList.add('btn-outline');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
-        alert(`Error: ${data.message}`);
+        PlacementPortal.handleApiError(result, 'Failed to submit application');
+        button.disabled = false;
+        button.innerHTML = originalContent;
       }
-    })
-    .catch(error => {
+    } catch (error) {
       console.error('Error applying for job:', error);
-      alert('An error occurred while submitting your application.');
-    });
+      PlacementPortal.showFlashMessage('An error occurred while submitting your application.', 'error');
+      button.disabled = false;
+      button.innerHTML = originalContent;
+    }
+  }
+
+  function showJobDetailsModal(jobId) {
+    // Create modal HTML
+    const modalHTML = `
+      <div class="modal" id="jobDetailsModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Job Details</h3>
+            <button class="modal-close" onclick="closeModal('jobDetailsModal')">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="loading-spinner"></div>
+            <p>Loading job details...</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modal = document.getElementById('jobDetailsModal');
+    modal.style.display = 'block';
+
+    // Load job details (placeholder - would fetch from API)
+    setTimeout(() => {
+      const modalBody = modal.querySelector('.modal-body');
+      modalBody.innerHTML = `
+        <h4>Software Developer</h4>
+        <p><strong>Company:</strong> Tech Solutions Inc.</p>
+        <p><strong>Location:</strong> Bangalore, India</p>
+        <p><strong>Compensation:</strong> ₹8-12 LPA</p>
+        <p><strong>Job Type:</strong> Full-time</p>
+        <p><strong>Requirements:</strong> Bachelor's degree in Computer Science, 2+ years experience with Java/Python</p>
+        <p><strong>Description:</strong> We are looking for a passionate software developer to join our team...</p>
+      `;
+    }, 1000);
+  }
+
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+      modal.remove();
+    }
   }
   
   // Notification functionality

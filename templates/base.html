@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
   <div class="bg-particles"></div>
-  <div class="container">
+  <div class="container {% block container_class %}{% endblock %}">
     <div class="logo">
       <a href="{{ url_for('index') }}"><i class="fas fa-university"></i> <span class="highlight">Placement</span>Hub</a>
     </div>

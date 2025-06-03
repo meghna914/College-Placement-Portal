@@ -28,7 +28,7 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'student', 'company', 'admin'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_approved = db.Column(db.Boolean, default=False)
+    is_approved = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -82,7 +82,7 @@ class Job(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deadline = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
-    is_approved = db.Column(db.Boolean, default=False)
+    is_approved = db.Column(db.Boolean, default=True)
     
     company = db.relationship('Company', backref=db.backref('jobs', lazy=True))
     
@@ -199,12 +199,8 @@ def login():
         role = request.args.get('role', 'student')
         
         user = User.query.filter_by(username=username, role=role).first()
-        
+
         if user and check_password_hash(user.password, password):
-            if not user.is_approved and user.role != 'admin':
-                flash('Your account is pending approval.')
-                return redirect(url_for('login'))
-            
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
@@ -244,8 +240,8 @@ def register():
             flash('Email already registered')
             return redirect(url_for('register', role=role))
         
-        # Create new user
-        new_user = User(username=username, email=email, password=password, role=role)
+        # Create new user (automatically approved)
+        new_user = User(username=username, email=email, password=password, role=role, is_approved=True)
         db.session.add(new_user)
         db.session.flush()  # Get the user ID
         
@@ -278,8 +274,8 @@ def register():
             db.session.add(new_company)
         
         db.session.commit()
-        
-        flash('Registration successful! Please wait for admin approval.')
+
+        flash('Registration successful! You can now login to your account.')
         return redirect(url_for('login', role=role))
     
     role = request.args.get('role', 'student')
@@ -303,8 +299,7 @@ def student_dashboard():
     if student.cgpa:
         eligible_jobs = Job.query.filter(
             Job.cgpa_cutoff <= student.cgpa,
-            Job.is_active == True,
-            Job.is_approved == True
+            Job.is_active == True
         ).all()
     
     # Get student skills
@@ -356,25 +351,17 @@ def admin_dashboard():
     job_count = Job.query.count()
     placed_count = Application.query.filter_by(status='offered').count()
     
-    # Get pending approvals
-    pending_students = User.query.filter_by(role='student', is_approved=False).all()
-    pending_companies = User.query.filter_by(role='company', is_approved=False).all()
-    pending_jobs = Job.query.filter_by(is_approved=False).all()
-    
     # Get all students, companies, and jobs for admin management
     all_students = Student.query.join(User).all()
     all_companies = Company.query.join(User).all()
     all_jobs = Job.query.all()
-    
+
     return render_template(
         'admin-dashboard.html',
         student_count=student_count,
         company_count=company_count,
         job_count=job_count,
         placed_count=placed_count,
-        pending_students=pending_students,
-        pending_companies=pending_companies,
-        pending_jobs=pending_jobs,
         all_students=all_students,
         all_companies=all_companies,
         all_jobs=all_jobs
@@ -385,7 +372,7 @@ def admin_dashboard():
 @login_required
 @role_required(['student'])
 def get_jobs():
-    jobs = Job.query.filter_by(is_active=True, is_approved=True).all()
+    jobs = Job.query.filter_by(is_active=True).all()
     result = []
     
     for job in jobs:
@@ -463,7 +450,8 @@ def post_job():
         requirements=data['requirements'],
         cgpa_cutoff=float(data['cgpa_cutoff']),
         positions=int(data['positions']),
-        deadline=datetime.strptime(data['deadline'], '%Y-%m-%d') if data.get('deadline') else None
+        deadline=datetime.strptime(data['deadline'], '%Y-%m-%d') if data.get('deadline') else None,
+        is_approved=True  # Automatically approve new jobs
     )
     db.session.add(new_job)
     
@@ -484,24 +472,15 @@ def post_job():
                 job_skill = JobSkill(job_id=new_job.id, skill_id=skill.id)
                 db.session.add(job_skill)
     
-    # Notify admin for approval
-    admin_users = User.query.filter_by(role='admin').all()
-    for admin in admin_users:
-        notification = Notification(
-            user_id=admin.id,
-            message=f"New job posting '{new_job.title}' by {company.company_name} needs approval"
-        )
-        db.session.add(notification)
-    
     db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Job posted successfully and awaiting approval'})
+
+    return jsonify({'success': True, 'message': 'Job posted successfully and is now live!'})
 
 @app.route('/api/update-profile', methods=['POST'])
 @login_required
 def update_profile():
     user_id = session['user_id']
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     
     if not user:
         return jsonify({'success': False, 'message': 'User not found'})
@@ -523,7 +502,7 @@ def update_profile():
         if 'resume' in request.files:
             resume_file = request.files['resume']
             if resume_file.filename != '':
-                filename = f"resume_{user_id}_{int(datetime.utcnow().timestamp())}.pdf"
+                filename = f"resume_{user_id}_{int(datetime.now(datetime.timezone.utc).timestamp())}.pdf"
                 resume_path = os.path.join(app.root_path, 'static', 'uploads', 'resumes', filename)
                 os.makedirs(os.path.dirname(resume_path), exist_ok=True)
                 resume_file.save(resume_path)
@@ -567,7 +546,7 @@ def update_profile():
         if 'logo' in request.files:
             logo_file = request.files['logo']
             if logo_file.filename != '':
-                filename = f"logo_{user_id}_{int(datetime.utcnow().timestamp())}.png"
+                filename = f"logo_{user_id}_{int(datetime.now(datetime.timezone.utc).timestamp())}.png"
                 logo_path = os.path.join(app.root_path, 'static', 'uploads', 'logos', filename)
                 os.makedirs(os.path.dirname(logo_path), exist_ok=True)
                 logo_file.save(logo_path)
@@ -578,50 +557,7 @@ def update_profile():
     return jsonify({'success': True, 'message': 'Profile updated successfully'})
 
 # Admin API routes
-@app.route('/api/admin/approve-user/<int:user_id>', methods=['POST'])
-@login_required
-@role_required(['admin'])
-def approve_user(user_id):
-    user = User.query.get(user_id)
-    
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found'})
-    
-    user.is_approved = True
-    
-    # Create notification for user
-    notification = Notification(
-        user_id=user.id,
-        message=f"Your account has been approved. You can now access all features."
-    )
-    db.session.add(notification)
-    
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'User approved successfully'})
-
-@app.route('/api/admin/approve-job/<int:job_id>', methods=['POST'])
-@login_required
-@role_required(['admin'])
-def approve_job(job_id):
-    job = Job.query.get(job_id)
-    
-    if not job:
-        return jsonify({'success': False, 'message': 'Job not found'})
-    
-    job.is_approved = True
-    
-    # Create notification for company
-    company = Company.query.get(job.company_id)
-    notification = Notification(
-        user_id=company.user_id,
-        message=f"Your job posting '{job.title}' has been approved and is now live."
-    )
-    db.session.add(notification)
-    
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Job approved successfully'})
+# Removed approval routes - users and jobs are now automatically approved
 
 # Company application management
 @app.route('/api/company/update-application-status', methods=['POST'])

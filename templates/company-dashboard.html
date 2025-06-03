@@ -2,24 +2,47 @@
 
 {% block title %}Company Dashboard{% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+{% block container_class %}dashboard-container{% endblock %}
+
 {% block content %}
-<h2><i class="fas fa-building"></i> Company Dashboard</h2>
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <h2><i class="fas fa-building"></i> Company Dashboard</h2>
+      <p class="header-subtitle">Manage your company profile and job postings</p>
+    </div>
+    <div class="header-right">
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ jobs|length }}</span>
+          <span class="stat-label">Active Jobs</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">0</span>
+          <span class="stat-label">Applications</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="user-greeting">
-  <h3>Welcome, {{ company.company_name }}</h3>
-  <p>Industry: {{ company.industry }}</p>
+  <h3>Welcome back, {{ company.company_name }}!</h3>
+  <p>Industry: {{ company.industry }} | Ready to find top talent?</p>
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('profile')">Company Profile</div>
-  <div class="tab" onclick="showTab('jobs')">Job Postings</div>
-  <div class="tab" onclick="showTab('applications')">Applications</div>
-  <div class="tab" onclick="showTab('notifications')">Notifications</div>
+  <div class="tab active" onclick="showTab('profile')"><i class="fas fa-id-card"></i> Company Profile</div>
+  <div class="tab" onclick="showTab('jobs')"><i class="fas fa-briefcase"></i> Job Postings</div>
+  <div class="tab" onclick="showTab('applications')"><i class="fas fa-clipboard-list"></i> Applications</div>
+  <div class="tab" onclick="showTab('notifications')"><i class="fas fa-bell"></i> Notifications</div>
 </div>
 
 <section id="profile-tab" class="card">
   <h3><i class="fas fa-id-card"></i> Company Profile</h3>
-  <form id="company-profile-form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+  <form id="company-profile-form" enctype="multipart/form-data">
     <div class="form-row">
       <div class="form-column">
         <div class="form-group">
@@ -89,7 +112,7 @@
   </div>
   
   <div id="job-form-container" style="display: none;">
-    <form id="job-form" action="{{ url_for('post_job') }}" method="POST">
+    <form id="job-form">
       <h4>New Job Posting</h4>
       
       <div class="form-row">
@@ -150,8 +173,8 @@
       </div>
       
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="hideJobForm()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Post Job</button>
+        <button type="button" class="btn btn-outline" onclick="hideJobForm()"><i class="fas fa-times"></i> Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Post Job</button>
       </div>
     </form>
   </div>
@@ -335,18 +358,32 @@
     showJobForm();
   }
   
-  function toggleJobStatus(jobId) {
-    fetch(`/api/jobs/${jobId}/toggle-status`, {
-      method: 'POST',
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        window.location.reload();
+  async function toggleJobStatus(jobId) {
+    const button = event.target;
+    const originalContent = button.innerHTML;
+
+    // Set loading state
+    PlacementPortal.setLoadingState(button, true);
+
+    try {
+      const result = await PlacementPortal.makeApiCall(`/api/jobs/${jobId}/toggle-status`, {
+        method: 'POST'
+      });
+
+      if (result.success) {
+        PlacementPortal.showFlashMessage('Job status updated successfully!', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        alert(`Error: ${data.message}`);
+        PlacementPortal.handleApiError(result, 'Failed to update job status');
+        PlacementPortal.setLoadingState(button, false);
       }
-    });
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      PlacementPortal.showFlashMessage('An error occurred while updating job status.', 'error');
+      PlacementPortal.setLoadingState(button, false);
+    }
   }
   
   function viewApplications(jobId) {
@@ -368,56 +405,153 @@
     });
   }
   
-  function updateApplicationStatus(applicationId, status) {
-    fetch(`/api/company/update-application-status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        application_id: applicationId,
-        status: status
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
+  async function updateApplicationStatus(applicationId, status) {
+    if (!status) return;
+
+    const selectElement = event.target;
+    const originalValue = selectElement.value;
+
+    try {
+      const result = await PlacementPortal.makeApiCall('/api/company/update-application-status', {
+        method: 'POST',
+        body: JSON.stringify({
+          application_id: applicationId,
+          status: status
+        })
+      });
+
+      if (result.success) {
         // Update the UI
-        const statusCell = document.querySelector(`select[onchange*="${applicationId}"]`).closest('tr').querySelector('td:nth-child(5) span');
+        const statusCell = selectElement.closest('tr').querySelector('td:nth-child(5) span');
         statusCell.className = `status-badge status-${status}`;
         statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+        // Reset select to default
+        selectElement.value = '';
+
+        PlacementPortal.showFlashMessage('Application status updated successfully!', 'success');
       } else {
-        alert(`Error: ${data.message}`);
+        PlacementPortal.handleApiError(result, 'Failed to update application status');
+        selectElement.value = originalValue;
       }
-    });
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      PlacementPortal.showFlashMessage('An error occurred while updating application status.', 'error');
+      selectElement.value = originalValue;
+    }
   }
   
-  // Application filtering
+  // Initialize dashboard functionality
   document.addEventListener('DOMContentLoaded', function() {
+    // Handle company profile form submission
+    const companyProfileForm = document.getElementById('company-profile-form');
+    if (companyProfileForm) {
+      companyProfileForm.addEventListener('submit', handleCompanyProfileSubmit);
+    }
+
+    // Handle job posting form submission
+    const jobForm = document.getElementById('job-form');
+    if (jobForm) {
+      jobForm.addEventListener('submit', handleJobSubmit);
+    }
+
+    // Application filtering
     const jobFilter = document.getElementById('job-filter');
     const statusFilter = document.getElementById('status-filter');
-    
+
     if (jobFilter && statusFilter) {
       jobFilter.addEventListener('change', filterApplications);
       statusFilter.addEventListener('change', filterApplications);
     }
-    
+
     function filterApplications() {
       const jobId = jobFilter.value;
       const status = statusFilter.value;
       const rows = document.querySelectorAll('#applications-table tbody tr');
-      
+
       rows.forEach(row => {
         const rowJobId = row.dataset.jobId;
         const rowStatus = row.dataset.status;
-        
+
         const matchesJob = jobId === 'all' || rowJobId === jobId;
         const matchesStatus = status === 'all' || rowStatus === status;
-        
+
         row.style.display = (matchesJob && matchesStatus) ? '' : 'none';
       });
     }
   });
+
+  // Handle company profile form submission with AJAX
+  async function handleCompanyProfileSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const formData = new FormData(form);
+
+    // Set loading state
+    PlacementPortal.setLoadingState(submitBtn, true);
+
+    try {
+      const response = await fetch('/api/update-profile', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        PlacementPortal.showFlashMessage('Company profile updated successfully!', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        PlacementPortal.showFlashMessage(result.message || 'Failed to update profile', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      PlacementPortal.showFlashMessage('An error occurred while updating your profile.', 'error');
+    } finally {
+      PlacementPortal.setLoadingState(submitBtn, false);
+    }
+  }
+
+  // Handle job posting form submission with AJAX
+  async function handleJobSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const formData = new FormData(form);
+
+    // Set loading state
+    PlacementPortal.setLoadingState(submitBtn, true);
+
+    try {
+      const response = await fetch('/api/post-job', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        PlacementPortal.showFlashMessage('Job posted successfully and is now live!', 'success');
+        form.reset();
+        hideJobForm();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        PlacementPortal.showFlashMessage(result.message || 'Failed to post job', 'error');
+      }
+    } catch (error) {
+      console.error('Error posting job:', error);
+      PlacementPortal.showFlashMessage('An error occurred while posting the job.', 'error');
+    } finally {
+      PlacementPortal.setLoadingState(submitBtn, false);
+    }
+  }
   
   // Notification functionality
   function markAsRead(notificationId) {

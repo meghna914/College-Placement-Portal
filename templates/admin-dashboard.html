@@ -2,19 +2,48 @@
 
 {% block title %}Admin Dashboard{% endblock %}
 
-{% block content %}
-<h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+{% block body_class %}dashboard-page{% endblock %}
+{% block container_class %}dashboard-container{% endblock %}
 
-<div class="user-greeting">
-  <h3>Welcome, Administrator</h3>
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+      <p class="header-subtitle">Manage students, companies, and monitor platform activity</p>
+    </div>
+    <div class="header-right">
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ student_count }}</span>
+          <span class="stat-label">Students</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ company_count }}</span>
+          <span class="stat-label">Companies</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ job_count }}</span>
+          <span class="stat-label">Jobs</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="tabs">  <div class="tab active" onclick="showTab('overview')">Overview</div>
-  <div class="tab" onclick="showTab('students')">Students</div>
-  <div class="tab" onclick="showTab('companies')">Companies</div>
-  <div class="tab" onclick="showTab('jobs')">Jobs</div>
-  <div class="tab" onclick="showTab('reports')">Reports</div>
-  <div class="tab" onclick="showTab('database')">Database</div>
+<div class="user-greeting">
+  <h3>Welcome, Administrator!</h3>
+  <p>System Status: All services running smoothly | Auto-approval enabled</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')"><i class="fas fa-tachometer-alt"></i> Overview</div>
+  <div class="tab" onclick="showTab('students')"><i class="fas fa-user-graduate"></i> Students</div>
+  <div class="tab" onclick="showTab('companies')"><i class="fas fa-building"></i> Companies</div>
+  <div class="tab" onclick="showTab('jobs')"><i class="fas fa-briefcase"></i> Jobs</div>
+  <div class="tab" onclick="showTab('reports')"><i class="fas fa-chart-bar"></i> Reports</div>
+  <div class="tab" onclick="showTab('database')"><i class="fas fa-database"></i> Database</div>
 </div>
 
 <section id="overview-tab" class="card">
@@ -61,114 +90,17 @@
     </div>
   </div>
 
-  <h4><i class="fas fa-clipboard-check"></i> Pending Approvals</h4>
-  
-  {% if pending_students or pending_companies or pending_jobs %}
-    <div class="pending-approvals-container">
-      {% if pending_students %}
-        <div class="approval-section">
-          <h5>Student Accounts</h5>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Registration Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in pending_students %}
-                <tr>
-                  <td>{{ user.student.full_name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-success" onclick="approveUser({{ user.id }})"><i class="fas fa-check"></i> Approve</button>
-                    <button class="btn btn-sm btn-danger" onclick="rejectUser({{ user.id }})"><i class="fas fa-times"></i> Reject</button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      {% endif %}
-      
-      {% if pending_companies %}
-        <div class="approval-section">
-          <h5>Company Accounts</h5>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Company</th>
-                  <th>Industry</th>
-                  <th>Contact Person</th>
-                  <th>Registration Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in pending_companies %}
-                <tr>
-                  <td>{{ user.company.company_name }}</td>
-                  <td>{{ user.company.industry }}</td>
-                  <td>{{ user.company.hr_name }}</td>
-                  <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-success" onclick="approveUser({{ user.id }})"><i class="fas fa-check"></i> Approve</button>
-                    <button class="btn btn-sm btn-danger" onclick="rejectUser({{ user.id }})"><i class="fas fa-times"></i> Reject</button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      {% endif %}
-      
-      {% if pending_jobs %}
-        <div class="approval-section">
-          <h5>Job Postings</h5>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Job Title</th>
-                  <th>Company</th>
-                  <th>Location</th>
-                  <th>Positions</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for job in pending_jobs %}
-                <tr>
-                  <td>{{ job.title }}</td>
-                  <td>{{ job.company.company_name }}</td>
-                  <td>{{ job.location }}</td>
-                  <td>{{ job.positions }}</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm" onclick="viewJobDetails({{ job.id }})"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-sm btn-success" onclick="approveJob({{ job.id }})"><i class="fas fa-check"></i> Approve</button>
-                    <button class="btn btn-sm btn-danger" onclick="rejectJob({{ job.id }})"><i class="fas fa-times"></i> Reject</button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  {% else %}
+  <div class="card">
+    <h3><i class="fas fa-check-circle"></i> Automatic Approval System</h3>
     <div class="empty-state">
-      <i class="fas fa-clipboard-check empty-icon"></i>
-      <p>No pending approvals at the moment.</p>
+      <div class="empty-icon">
+        <i class="fas fa-magic"></i>
+      </div>
+      <p><strong>All registrations and job postings are automatically approved!</strong></p>
+      <p class="hint">Students and companies can access the platform immediately after registration.</p>
+      <p class="hint">Job postings go live instantly without requiring manual approval.</p>
     </div>
-  {% endif %}
+  </div>
 </section>
 
 <section id="students-tab" class="card" style="display: none;">
@@ -220,12 +152,9 @@
           <td>{{ student.branch }}</td>
           <td>{{ student.cgpa or 'N/A' }}</td>
           <td>{{ student.graduation_year }}</td>
-          <td><span class="status-badge status-{{ 'approved' if student.user.is_approved else 'pending' }}">{{ 'Approved' if student.user.is_approved else 'Pending' }}</span></td>
+          <td><span class="status-badge status-approved">Approved</span></td>
           <td class="actions-cell">
             <button class="btn btn-sm" onclick="viewStudentDetails({{ student.id }})"><i class="fas fa-eye"></i></button>
-            {% if not student.user.is_approved %}
-            <button class="btn btn-sm btn-success" onclick="approveUser({{ student.user.id }})"><i class="fas fa-check"></i></button>
-            {% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -276,12 +205,9 @@
           <td>{{ company.location }}</td>
           <td>{{ company.hr_name }}</td>
           <td>{{ company.jobs|length }}</td>
-          <td><span class="status-badge status-{{ 'approved' if company.user.is_approved else 'pending' }}">{{ 'Approved' if company.user.is_approved else 'Pending' }}</span></td>
+          <td><span class="status-badge status-approved">Approved</span></td>
           <td class="actions-cell">
             <button class="btn btn-sm" onclick="viewCompanyDetails({{ company.id }})"><i class="fas fa-eye"></i></button>
-            {% if not company.user.is_approved %}
-            <button class="btn btn-sm btn-success" onclick="approveUser({{ company.user.id }})"><i class="fas fa-check"></i></button>
-            {% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -308,7 +234,6 @@
         <option value="">All Status</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
-        <option value="pending">Pending Approval</option>
       </select>
     </div>
   </div>
@@ -329,7 +254,7 @@
       </thead>
       <tbody>
         {% for job in all_jobs %}
-        <tr data-type="{{ job.job_type }}" data-status="{{ 'active' if job.is_active and job.is_approved else 'inactive' if job.is_approved else 'pending' }}">
+        <tr data-type="{{ job.job_type }}" data-status="{{ 'active' if job.is_active else 'inactive' }}">
           <td>{{ job.title }}</td>
           <td>{{ job.company.company_name }}</td>
           <td>{{ job.job_type|capitalize }}</td>
@@ -337,15 +262,12 @@
           <td>{{ job.positions }}</td>
           <td>{{ job.applications|length }}</td>
           <td>
-            <span class="status-badge status-{{ 'active' if job.is_active and job.is_approved else 'inactive' if job.is_approved else 'pending' }}">
-              {{ 'Active' if job.is_active and job.is_approved else 'Inactive' if job.is_approved else 'Pending' }}
+            <span class="status-badge status-{{ 'active' if job.is_active else 'inactive' }}">
+              {{ 'Active' if job.is_active else 'Inactive' }}
             </span>
           </td>
           <td class="actions-cell">
             <button class="btn btn-sm" onclick="viewJobDetails({{ job.id }})"><i class="fas fa-eye"></i></button>
-            {% if not job.is_approved %}
-            <button class="btn btn-sm btn-success" onclick="approveJob({{ job.id }})"><i class="fas fa-check"></i></button>
-            {% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -580,70 +502,7 @@
     document.getElementById(`${tabName}-tab`).style.display = 'block';
   }
   
-  // Approve/reject functionality
-  function approveUser(userId) {
-    fetch(`/api/admin/approve-user/${userId}`, {
-      method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('User approved successfully.');
-        window.location.reload();
-      } else {
-        alert(`Error: ${data.message}`);
-      }
-    });
-  }
-  
-  function rejectUser(userId) {
-    if (confirm('Are you sure you want to reject this user?')) {
-      fetch(`/api/admin/reject-user/${userId}`, {
-        method: 'POST'
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('User rejected successfully.');
-          window.location.reload();
-        } else {
-          alert(`Error: ${data.message}`);
-        }
-      });
-    }
-  }
-  
-  function approveJob(jobId) {
-    fetch(`/api/admin/approve-job/${jobId}`, {
-      method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Job approved successfully.');
-        window.location.reload();
-      } else {
-        alert(`Error: ${data.message}`);
-      }
-    });
-  }
-  
-  function rejectJob(jobId) {
-    if (confirm('Are you sure you want to reject this job posting?')) {
-      fetch(`/api/admin/reject-job/${jobId}`, {
-        method: 'POST'
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Job rejected successfully.');
-          window.location.reload();
-        } else {
-          alert(`Error: ${data.message}`);
-        }
-      });
-    }
-  }
+  // Note: Approval functionality removed - all users and jobs are automatically approved
   
   // View details functions
   function viewStudentDetails(studentId) {
